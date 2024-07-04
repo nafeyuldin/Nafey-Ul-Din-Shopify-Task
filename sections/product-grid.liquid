@@ -1,0 +1,142 @@
+<div class="product_Grid">
+  <h1 style=" font-weight: bold;">{{section.settings.title}}</h1>
+  <div class="grid_section">
+    {% for block in section.blocks %}
+    {% case block.type %}
+    {% when "product" %}
+    {% assign product = block.settings.product %}
+    <div class="grid_item">
+      <img src="{{   product.featured_image |  image_url    }}" height="100%" width="auto" alt="{{ product.title }}" />
+      <div class="overlay_plus"> + </div>
+      <div class="product_popup hidden">
+        <span> <svg class="poup_crossBar " width="40px" height="40px" viewBox="0 -0.5 25 25" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.96967 16.4697C6.67678 16.7626 6.67678 17.2374 6.96967 17.5303C7.26256 17.8232 7.73744 17.8232 8.03033 17.5303L6.96967 16.4697ZM13.0303 12.5303C13.3232 12.2374 13.3232 11.7626 13.0303 11.4697C12.7374 11.1768 12.2626 11.1768 11.9697 11.4697L13.0303 12.5303ZM11.9697 11.4697C11.6768 11.7626 11.6768 12.2374 11.9697 12.5303C12.2626 12.8232 12.7374 12.8232 13.0303 12.5303L11.9697 11.4697ZM18.0303 7.53033C18.3232 7.23744 18.3232 6.76256 18.0303 6.46967C17.7374 6.17678 17.2626 6.17678 16.9697 6.46967L18.0303 7.53033ZM13.0303 11.4697C12.7374 11.1768 12.2626 11.1768 11.9697 11.4697C11.6768 11.7626 11.6768 12.2374 11.9697 12.5303L13.0303 11.4697ZM16.9697 17.5303C17.2626 17.8232 17.7374 17.8232 18.0303 17.5303C18.3232 17.2374 18.3232 16.7626 18.0303 16.4697L16.9697 17.5303ZM11.9697 12.5303C12.2626 12.8232 12.7374 12.8232 13.0303 12.5303C13.3232 12.2374 13.3232 11.7626 13.0303 11.4697L11.9697 12.5303ZM8.03033 6.46967C7.73744 6.17678 7.26256 6.17678 6.96967 6.46967C6.67678 6.76256 6.67678 7.23744 6.96967 7.53033L8.03033 6.46967ZM8.03033 17.5303L13.0303 12.5303L11.9697 11.4697L6.96967 16.4697L8.03033 17.5303ZM13.0303 12.5303L18.0303 7.53033L16.9697 6.46967L11.9697 11.4697L13.0303 12.5303ZM11.9697 12.5303L16.9697 17.5303L18.0303 16.4697L13.0303 11.4697L11.9697 12.5303ZM13.0303 11.4697L8.03033 6.46967L6.96967 7.53033L11.9697 12.5303L13.0303 11.4697Z"
+              fill="#000000" />
+          </svg></span>
+        <div class="product_content">
+          <div class="product_gallery">
+            <img src="{{ product.featured_image |  image_url  }}" alt="{{ product.title }}" height="auto"
+              width="100%" />
+          </div>
+          <div class="product_info">
+            <h3>{{ product.title }}</h3>
+            <h5>{{ product.price | money }}</h5>
+            <p> {{ product.description }}</p>
+          </div>
+        </div>
+
+        <div product-handle="{{ product.handle }}" class="product__variants">
+          {% form 'product', product, class: 'product_form' %}
+          <input name="id" class="form_input" type="hidden"
+            value="{{ product.selected_or_first_available_variant.id   }}" />
+          {% for option in product.options_with_values %}
+          {% if option.name == "Color" %}
+          <label> {{ option.name }} </label>
+          <div class="radio_row">
+            {% for value in option.values %}
+            <div style="background-color: {{value}}" class="radio_item">
+              <label style="margin-left: 5px !important;" class="label">{{ value }}</label>
+              <input type="radio" {% if option.selected_value==value %} checked {% endif %} class="radio_input"
+                name="options[{{ option.name | handle }}]" id="option-{{ value.id | handle  }}" value="{{ value }}">
+
+            </div>
+
+            {% endfor %}
+
+          </div>
+
+          {% else %}
+          <label for="option-{{ option.name | handle }}">{{ option.name }}</label>
+          <select name="options[{{ option.name | handle }}]" id="option-{{ option.name | handle }}"
+            class="product-options">
+
+            {% for value in option.values %}
+            {% if option.selected_value == value %}
+            <option>Choose Your Size </option>
+            {% endif %}
+            <option {% if option.selected_value==value %} checked {% endif %} value="{{ value }}"> {{ value }} </option>
+            {% endfor %}
+          </select>
+
+
+          {% endif %}
+          {% endfor %}
+          <button class="form_submit_button" type="submit">ADD TO CART <svg width="20px" height="20px"
+              viewBox="0 -6.5 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink">
+
+
+              <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="ui-gambling-website-lined-icnos-casinoshunter" transform="translate(-212.000000, -159.000000)"
+                  fill="#ffffff" fill-rule="nonzero">
+                  <g id="square-filled" transform="translate(50.000000, 120.000000)">
+                    <path
+                      d="M187.108012,39.2902857 L197.649804,49.7417043 L197.708994,49.7959169 C197.889141,49.9745543 197.986143,50.2044182 198,50.4382227 L198,50.5617773 C197.986143,50.7955818 197.889141,51.0254457 197.708994,51.2040831 L197.6571,51.2479803 L187.108012,61.7097143 C186.717694,62.0967619 186.084865,62.0967619 185.694547,61.7097143 C185.30423,61.3226668 185.30423,60.6951387 185.694547,60.3080911 L194.702666,51.3738496 L162.99947,51.3746291 C162.447478,51.3746291 162,50.9308997 162,50.3835318 C162,49.8361639 162.447478,49.3924345 162.99947,49.3924345 L194.46779,49.3916551 L185.694547,40.6919089 C185.30423,40.3048613 185.30423,39.6773332 185.694547,39.2902857 C186.084865,38.9032381 186.717694,38.9032381 187.108012,39.2902857 Z M197.115357,50.382693 L186.401279,61.0089027 L197.002151,50.5002046 L197.002252,50.4963719 L196.943142,50.442585 L196.882737,50.382693 L197.115357,50.382693 Z"
+                      id="right-arrow"></path>
+                  </g>
+                </g>
+              </g>
+            </svg> </button>
+          {% endform %}
+        </div>
+      </div>
+    </div>
+
+
+    {% endcase %}
+
+    {% endfor %}
+  </div>
+
+</div>
+
+<script>
+  // Arrays and sets to store data
+
+</script>
+{{ store.url }}
+{% schema %}
+{
+"name": "Products ",
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Section title",
+"default": "Tisso vison in the wild"
+},
+{
+"type": "product",
+"id": "gift",
+"label": "product"
+}
+],
+"blocks": [
+{
+"name": "product",
+"type": "product",
+"settings":[
+{
+"type": "product",
+"id": "product",
+"label": "product"
+}
+]
+
+}
+],
+"presets": [
+{
+"name": "Product Grid",
+"blocks": [
+{
+"type": "product"
+}
+]
+}
+]
+}
+
+{% endschema %}
