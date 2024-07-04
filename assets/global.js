@@ -1266,3 +1266,277 @@ class BulkAdd extends HTMLElement {
 if (!customElements.get('bulk-add')) {
   customElements.define('bulk-add', BulkAdd);
 }
+
+
+// custom Script
+
+
+
+document.querySelector('.menuBar').addEventListener('click', function(){
+  this.classList.add('hidden');
+  document.querySelector(".crossBar").classList.remove("hidden");
+  document.querySelector(".accouncemntbar_content_formobile").classList.remove('hidden');
+
+})
+document.querySelector('.crossBar').addEventListener('click', function(){
+ this.classList.add('hidden');
+ document.querySelector(".menuBar").classList.remove("hidden");
+ document.querySelector(".accouncemntbar_content_formobile").classList.add('hidden');
+
+})
+
+
+// Select all .overlay_plus elements within .grid_item
+const overlayPluses = document.querySelectorAll(".grid_item .overlay_plus");
+
+// Generate an array of possible positions
+const possiblePositions = generateUniquePositions(overlayPluses.length);
+
+// Assign positions to each .overlay_plus element
+overlayPluses.forEach((plus, index) => {
+    plus.style.left = possiblePositions[index].left + "px";
+    plus.style.top = possiblePositions[index].right + "px";
+});
+
+// Function to generate unique positions
+function generateUniquePositions(count) {
+    let positions = [];
+    for (let i = 0; i < count; i++) {
+        let left = Math.floor(Math.random() * (100 - 20 + 1)) + 40;
+        let right = Math.floor(Math.random() * (100 - 20 + 1)) + 40;
+        positions.push({ left, right });
+    }
+    return positions;
+}
+
+document.querySelectorAll(".grid_item").forEach((plus) => {
+  plus.querySelector('.overlay_plus').addEventListener("click", () => {
+    plus.querySelector('.product_popup').classList.remove('hidden')
+  })
+  plus.querySelector('.poup_crossBar').addEventListener("click", () => {
+    plus.querySelector('.product_popup').classList.add('hidden')
+  })
+})
+
+
+//  product popup
+
+document.querySelectorAll(".product_form").forEach(form => {
+  form.querySelectorAll('.radio_item').forEach(radioItem => {
+    let radioInput = radioItem.querySelector('input[type="radio"]');
+    if (radioInput.checked) {
+      radioItem.querySelector('label').classList.add('bgblack');
+    } else {
+      radioItem.querySelector('label').classList.remove('bgblack');
+
+    }
+  });
+  form.addEventListener('change', () => {
+    form.querySelectorAll('.radio_item').forEach(radioItem => {
+      let radioInput = radioItem.querySelector('input[type="radio"]');
+      if (radioInput.checked) {
+        radioItem.querySelector('label').classList.add('bgblack');
+      } else {
+        radioItem.querySelector('label').classList.remove('bgblack');
+
+      }
+    });
+  })
+
+});
+
+
+let Handle_Array = [];
+let jsonurlArray = [];
+let loggedItems = new Set();
+let selectedOptions = [];
+
+// Fetch all product handles
+document.querySelectorAll(".product__variants").forEach((handle) => {
+  Handle_Array.push(handle.getAttribute("product-handle").replace(" ", ""));
+}); document.addEventListener('DOMContentLoaded', function () {
+  let Handle_Array = [];
+  let jsonurlArray = [];
+  let loggedItems = new Set();
+  let selectedOptions = [];
+
+  // Fetch all product handles
+  document.querySelectorAll(".product__variants").forEach((handle) => {
+    Handle_Array.push(handle.getAttribute("product-handle").trim());
+  });
+
+  // Construct JSON URLs
+  Handle_Array.forEach((handle) => {
+    jsonurlArray.push(`/products/${handle}.json`);
+  });
+
+  // Event listener for form changes
+  document.querySelectorAll(".product_form").forEach((form) => {
+    form.addEventListener('change', () => {
+      // Reset selected options
+      selectedOptions = [];
+
+      // Get selected options from select options and radio inputs
+      form.querySelectorAll(".product-options option:checked").forEach(option => {
+        selectedOptions.push(option.value);
+      });
+
+      form.querySelectorAll(".radio_input:checked").forEach(radio => {
+        selectedOptions.push(radio.value);
+      });
+
+      // Join selectedOptions with ' / ' separator
+      let selectedOptionsString = selectedOptions.join(' / ');
+
+      // Iterate over JSON URLs and fetch product data
+      jsonurlArray.forEach(url => {
+        fetch(url)
+          .then(response => response.json())
+          .then(product => {
+            let matchVariant = product.product.variants.find(variant => {
+              // Assuming selectedOptions should match the variant's title
+              return variant.title === selectedOptionsString;
+            });
+
+            if (matchVariant && !loggedItems.has(matchVariant.title)) {
+              // Update the variant ID in an input element
+              let inputElement = form.querySelector(".form_input");
+              inputElement.value = matchVariant.id;
+
+              // Add to logged items set
+              loggedItems.add(matchVariant.title);
+
+              // Add submit event listener only once per form
+              if (selectedOptionsString === 'M / Black') {
+                form.addEventListener('submit', function (event) {
+                  event.preventDefault();
+
+                  // Prepare data for cart addition
+                  let formData = {
+                    items: [
+                      { id: matchVariant.id },
+                      { id: 49485095076153 } // This seems to be a hardcoded ID, adjust as necessary
+                    ]
+                  };
+
+                  // Add to cart via Shopify AJAX API
+                  fetch(window.Shopify.routes.root + 'cart/add.js', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                  })
+                    .then(response => response.json())
+                    .then(response => {
+                      // Redirect to cart page
+                      window.location.href = '/cart';
+                    })
+                    .catch(error => {
+                      console.error('Error:', error);
+                    });
+                });
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching product JSON:', error);
+          });
+      });
+    });
+  });
+});
+
+
+// Construct JSON URLs
+Handle_Array.forEach((handle) => {
+  jsonurlArray.push(`/products/${handle}.json`);
+});
+
+// Event listener for form changes
+document.querySelectorAll(".product_form").forEach((form) => {
+
+  form.addEventListener('change', () => {
+    // Reset selected options
+    selectedOptions = [];
+
+    // Get selected options from both select options and radio inputs
+    form.querySelectorAll(".product-options option:checked").forEach(option => {
+      selectedOptions.push(option.value);
+    });
+    console.log(selectedOptions)
+    form.querySelectorAll(".radio_input:checked").forEach(radio => {
+      selectedOptions.push(radio.value);
+    });
+
+    // Join selectedOptions with ' / ' separator
+    let selectedOptionsString = selectedOptions.join(' / ');
+    console.log(selectedOptionsString);
+
+    // Iterate over JSON URLs and fetch product data
+    jsonurlArray.forEach(url => {
+      fetch(url)
+        .then(response => response.json())
+        .then(product => {
+          let matchVariant = product.product.variants.find(variant => {
+            // Assuming selectedOptions should match the variant's title
+            return variant.title === selectedOptionsString;
+          });
+
+          if (matchVariant && !loggedItems.has(matchVariant.title)) {
+            console.log('maching..')
+            if (selectedOptionsString === 'M / Black') {
+              form.addEventListener('submit', function (event) {
+                event.preventDefault()
+                let formData = {
+                  items: [
+                    {
+                      id: matchVariant.id
+                    },
+                    {
+                      id: 49485095076153
+                    }
+                  ]
+                }
+                fetch(window.Shopify.routes.root + 'cart/add.js', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(formData)
+                })
+                  .then(response => {
+                    return response.json();
+
+                  }).then(product => {
+                    event.preventDefault(false)
+                    window.redirect('/cart')
+
+                  })
+                  .catch((error) => {
+                    console.error('Error:', error);
+                  });
+
+              });
+            }
+
+
+
+            // Assuming there's an input element to set the variant ID
+            let inputElement = form.querySelector(".form_input");
+            inputElement.value = matchVariant.id;
+            console.log(inputElement.value);
+            loggedItems.add(matchVariant.title);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching product JSON:', error);
+        });
+    });
+  });
+});
+
+
+
+
+ 
